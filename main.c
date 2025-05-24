@@ -8,8 +8,16 @@
 
 #define COL 3
 #define ROW 3
+#define GEN 5
 
 void check_neihbours(int grid[COL][ROW],int i, int j,int *pt){
+        if( i - 1 >= 0){
+            if(grid[i-1][j] == 1) (*pt)++;
+        }
+        if( i + 1 < COL){
+            if(grid[i+1][j] == 1) (*pt)++;
+        }
+
 
         if( j - 1 >= 0){
             if(grid[i][j-1] == 1) (*pt)++;
@@ -36,38 +44,46 @@ void check_neihbours(int grid[COL][ROW],int i, int j,int *pt){
 }
 
 int main(){
-    int neighbours;
-    int grid[COL][ROW] = {{0,0,0},{1,1,1},{0,0, 0}};
+    int neighbours, n=0, u;
+    int grid[COL][ROW] = {{0,0,0},{1,0,1},{0,1, 0}};
     int buffer[COL][ROW]={{0,0,0},{0,0,0},{0,0, 0}};
 
-    for(int i=0;i < COL; i++){
-        for(int j=0;j< ROW;j++){
-            neighbours = 0;
-            check_neihbours(grid, i, j, &neighbours);
+    while(n<GEN){
+        for(int i=0;i < COL; i++){
+            for(int j=0;j< ROW;j++){
+                neighbours = 0;
+                check_neihbours(grid, i, j, &neighbours);
 
-            switch (neighbours) {
-                case 2:
-                    if(grid[i][j] == 0) buffer[i][j] = 0;
-                    else buffer[i][j] = 1;
-                case 3:
-                  if(grid[i][j] == 0 && neighbours == 3) buffer[i][j] = 1;
+                switch (neighbours) {
+                    case 2:
+                        if(grid[i][j] == 0) buffer[i][j] = 0;
+                        else buffer[i][j] = 1;
+                    case 3:
+                    if(grid[i][j] == 0 && neighbours == 3) buffer[i][j] = 1;
+                        break;
+                    default:
+                        buffer[i][j] = 0;
                     break;
-                default:
-                    buffer[i][j] = 0;
-                break;
+                }
+                
             }
-            
         }
-    }
-    
-    for(int i = 0;i< COL; i++){
-        for(int j=0;j<ROW;j++){
-            printf("%d",buffer[i][j]);
-            grid[i][j] = buffer[i][j];
+        u=0;
+        for(int i = 0;i< COL; i++){
+            for(int j=0;j<ROW;j++){
+                if(buffer[i][j]==1)u++;
+                printf("%d",buffer[i][j]);
+                grid[i][j] = buffer[i][j];
+            }
+            printf("\n");
+        }
+        if(u == 0){
+            printf("\nSimulación acabada a la gen: %d\n",n);
+            break;
         }
         printf("\n");
+        n++;
     }
-
 
 
 
