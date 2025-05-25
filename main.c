@@ -1,16 +1,22 @@
 //TO DO:
-// - Read a .txt with the grid to get the base plan (min 3*3)
-// - Cell life rules
-//      - /!\ overflow for checking around
+// - Read a file with the grid to get the base plan (256*256)
+// X Cell life rules 
+//      X /!\ overflow for checking around
 // - Print it on screen
 
+#include <stdlib.h>
 #include <stdio.h>
 
-#define COL 3
-#define ROW 3
+#define COL 256
+#define ROW 256
 #define GEN 10
 
-void check_neihbours(int grid[COL][ROW],int i, int j,int *pt){
+int grid[COL][ROW], buffer[COL][ROW];
+
+void check_neihbours(int i, int j,int *pt);
+void read_input();
+
+void check_neihbours(int i, int j,int *pt){
         
         for(int ai=-1;ai<2;ai++){
             if(i+ai <0 || i+ai >= ROW )continue;
@@ -23,18 +29,31 @@ void check_neihbours(int grid[COL][ROW],int i, int j,int *pt){
         //printf("neighbours: %d for cell [%d,%d]\n",*pt,i,j);
 }
 
+void read_input(){
+    int i =0;
+    FILE *fptr;
+    
+    if((fptr = fopen("in", "r") ) == NULL){
+        printf("File could not be openned");
+        exit(-1);
+    
+    while(fgets(grid[i], 256, fptr)){
+        i++;
+    }
+
+    }
+
+
+}
+
 int main(){
     int neighbours, n=0, u;
-    int grid[COL][ROW] = {{1,1,0},{1,1,1},{0,0, 0}};
-    int buffer[COL][ROW]={{0,0,0},{0,0,0},{0,0, 0}};
 
-
-
-   while(n<GEN){
+    /*while(n<GEN){
         for(int i=0;i < COL; i++){
             for(int j=0;j< ROW;j++){
                 neighbours = 0;
-                check_neihbours(grid, i, j, &neighbours);
+                check_neihbours(i, j, &neighbours);
 
                 switch (neighbours) {
                     case 2:
@@ -65,10 +84,6 @@ int main(){
         }
         printf("\nSimulación nº%d\n",n+1);
         n++;
-    }
-
-
-
-
+    }*/
     return 0;
 }
