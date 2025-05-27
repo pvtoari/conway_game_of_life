@@ -7,19 +7,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define COL 256
-#define ROW 256
+#define COL 3
+#define ROW 4
 #define GEN 10
 
-int grid[COL][ROW], buffer[COL][ROW];
+char grid[COL][ROW], buffer[COL][ROW];
 
 void check_neihbours(int i, int j,int *pt);
 void read_input();
 
 void check_neihbours(int i, int j,int *pt){
-        
         for(int ai=-1;ai<2;ai++){
-            if(i+ai <0 || i+ai >= ROW )continue;
+            if((i)+ai <0 || i+ai >= ROW )continue;
             for(int aj=-1;aj<2;aj++){
                 if(j+aj <0 || j+aj >= COL || (aj == 0 && ai == 0))continue;
                 if(grid[i+ai][j+aj] == 1 ) (*pt)++;
@@ -34,21 +33,29 @@ void read_input(){
     FILE *fptr;
     
     if((fptr = fopen("in", "r") ) == NULL){
-        printf("File could not be openned");
+        printf("File could not be openned\n");
         exit(-1);
-    
-    while(fgets(grid[i], 256, fptr)){
+    }
+
+    while(fgets(grid[i], ROW, fptr) != NULL){
+        if(sizeof(grid[i])/sizeof(char) != ROW){
+            printf("Bad grid format\n");
+            exit(-2);
+        }
         i++;
     }
 
-    }
+    fclose(fptr);
 
 
 }
 
 int main(){
     int neighbours, n=0, u;
-
+    read_input();
+    for(int i =0; i<COL;i++){
+        printf("%s", grid[i]);
+    }
     /*while(n<GEN){
         for(int i=0;i < COL; i++){
             for(int j=0;j< ROW;j++){
@@ -57,13 +64,13 @@ int main(){
 
                 switch (neighbours) {
                     case 2:
-                        if(grid[i][j] == 0) buffer[i][j] = 0;
-                        else buffer[i][j] = 1;
+                        if(grid[i][j] == '0') buffer[i][j] = '0';
+                        else buffer[i][j] = '1';
                     case 3:
-                    if(grid[i][j] == 0 && neighbours == 3) buffer[i][j] = 1;
+                    if(grid[i][j] == '0' && neighbours == 3) buffer[i][j] = '1';
                         break;
                     default:
-                        buffer[i][j] = 0;
+                        buffer[i][j] = '0';
                     break;
                 }
                 
@@ -72,7 +79,7 @@ int main(){
         u=0;
         for(int i = 0;i< COL; i++){
             for(int j=0;j<ROW;j++){
-                if(buffer[i][j]==1)u++;
+                if(buffer[i][j]=='1')u++;
                 printf("%d",buffer[i][j]);
                 grid[i][j] = buffer[i][j];
             }
