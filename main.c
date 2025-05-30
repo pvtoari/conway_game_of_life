@@ -8,10 +8,10 @@
 #include <stdio.h>
 
 #define COL 3
-#define ROW 4
+#define ROW 3
 #define GEN 10
 
-char grid[COL][ROW], buffer[COL][ROW];
+char grid[COL][ROW+1], buffer[COL][ROW];
 
 void check_neihbours(int i, int j,int *pt);
 void read_input();
@@ -21,11 +21,10 @@ void check_neihbours(int i, int j,int *pt){
             if((i)+ai <0 || i+ai >= ROW )continue;
             for(int aj=-1;aj<2;aj++){
                 if(j+aj <0 || j+aj >= COL || (aj == 0 && ai == 0))continue;
-                if(grid[i+ai][j+aj] == 1 ) (*pt)++;
+                if(grid[i+ai][j+aj] == '1' ) (*pt)++;
             }
 
         }
-        //printf("neighbours: %d for cell [%d,%d]\n",*pt,i,j);
 }
 
 void read_input(){
@@ -37,11 +36,12 @@ void read_input(){
         exit(-1);
     }
 
-    while(fgets(grid[i], ROW, fptr) != NULL){
-        if(sizeof(grid[i])/sizeof(char) != ROW){
+    while(fgets(grid[i], ROW+1, fptr) != NULL){
+        /*if(sizeof(grid[i])/sizeof(char) != ROW){
             printf("Bad grid format\n");
             exit(-2);
-        }
+        }*/
+        fseek(fptr, 1, SEEK_CUR);
         i++;
     }
 
@@ -53,10 +53,11 @@ void read_input(){
 int main(){
     int neighbours, n=0, u;
     read_input();
-    for(int i =0; i<COL;i++){
-        printf("%s", grid[i]);
-    }
-    /*while(n<GEN){
+    
+    /*for(int i =0; i<COL;i++){
+        printf("%s\n", grid[i]);
+    }*/
+    while(n<GEN){
         for(int i=0;i < COL; i++){
             for(int j=0;j< ROW;j++){
                 neighbours = 0;
@@ -80,7 +81,7 @@ int main(){
         for(int i = 0;i< COL; i++){
             for(int j=0;j<ROW;j++){
                 if(buffer[i][j]=='1')u++;
-                printf("%d",buffer[i][j]);
+                printf("%c",buffer[i][j]);
                 grid[i][j] = buffer[i][j];
             }
             printf("\n");
@@ -91,6 +92,6 @@ int main(){
         }
         printf("\nSimulación nº%d\n",n+1);
         n++;
-    }*/
+    }
     return 0;
 }
