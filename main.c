@@ -6,11 +6,12 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define SQR 
 #define COL 5
 #define ROW 5
-#define GEN 6
+#define GEN 100
 
 char grid[COL][ROW], buffer[COL][ROW];
 
@@ -50,27 +51,41 @@ void read_input(){
 }
 
 int print_gen(int *g){
-    int u =0;
-
+    int u =0,s =0;
+    printf("\x1b[2J");
+    printf("\x1b[H");
     for(int i = 0;i< COL; i++){
         for(int j=0;j<ROW;j++){
-            if(buffer[i][j]=='1')u++;
-            printf("%c",buffer[i][j]);
+            if(buffer[i][j] == grid[i][j]) s++;
+            if(buffer[i][j]=='1'){
+                u++;
+                //printf("O");
+                printf("\x1b[1;47m \x1b[0m");
+            }
+            else printf(" ");
             grid[i][j] = buffer[i][j];
         }
         printf("\n");
     }
     *g +=1;
-        if(u == 0){
+    
+    
+        if(u == 0 || s == ROW*COL){
             printf("\nSimulación acabada a la gen: %d\n",*g);
+            sleep(3);
             return -1;
         }
         printf("\nSimulación nº%d\n",*g);
+    
+    sleep(3);
     
     return 0;
 }
 
 int main(){
+    printf("\x1b[=14h");
+    printf("\x1b[?47h"); //save scren
+    printf("\x1b[2J");  //clear screen
     int neighbours, g=0;
     read_input();
     for(int i = 0; i<COL;i++){
@@ -102,7 +117,10 @@ int main(){
                 }
             }
         }
-        if(print_gen(&g) == -1) return -1;
+        if(print_gen(&g) == -1){
+            printf("\x1b[2J");
+            printf("\x1b[?47l"); //restore screen
+            return -1;}
     }
     return 0;
 }
