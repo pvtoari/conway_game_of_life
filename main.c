@@ -37,12 +37,19 @@ void setupConsole(void) {
 
 	if(!SetConsoleMode(stdoutHandle, outMode)) {
 		exit(GetLastError());
-	}	
+	}
+
+	printf("\x1b[=14h");
+    printf("\x1b[?47h"); //save scren
+    printf("\x1b[2J");  //clear screen		
 }
 
 void restoreConsole(void) {
     // Reset colors
     printf("\x1b[0m");	
+
+	printf("\x1b[2J");
+	printf("\x1b[?47l"); //restore screen
 	
     // Reset console mode
 	if(!SetConsoleMode(stdoutHandle, outModeInit)) {
@@ -52,11 +59,14 @@ void restoreConsole(void) {
 
 
 #else
-void setupConsole(void) {}
-void restoreConsole(void) {}
+void setupConsole(void) {
+	printf("\u001B[?1049h");
+}
+void restoreConsole(void) {
+	printf("\u001B[?1049l");
+}
 #endif
 
-#define SLP 1
 #define SLP 1*1000000
 #define COL 25
 #define ROW 25
@@ -145,9 +155,6 @@ int print_gen(int *g){
 }
 
 int main(){
-    printf("\x1b[=14h");
-    printf("\x1b[?47h"); //save scren
-    printf("\x1b[2J");  //clear screen
     setupConsole();
     int neighbours, g=0;
     read_input();
@@ -181,10 +188,11 @@ int main(){
             }
         }
         if(print_gen(&g) == -1){
-            printf("\x1b[2J");
             restoreConsole();
-            printf("\x1b[?47l"); //restore screen
             return -1;}
     }
+
+	restoreConsole();
+    
     return 0;
 }
