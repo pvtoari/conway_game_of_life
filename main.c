@@ -1,19 +1,69 @@
-//TO DO:
-// X Read a file with the grid to get the base plan (256*256)
-// X Cell life rules 
-//      X /!\ overflow for checking around
-// X Print it on screen
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 
-#define SQR 
-#define COL 5
-#define ROW 5
+
+//configure windows for ansi escape sequence terminal
+
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#ifdef _WIN32
+// Some old MinGW/CYGWIN distributions don't define this:
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING  0x0004
+#endif
+
+static HANDLE stdoutHandle;
+static DWORD outModeInit;
+
+void setupConsole(void) {
+	DWORD outMode = 0;
+	stdoutHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	if(stdoutHandle == INVALID_HANDLE_VALUE) {
+		exit(GetLastError());
+	}
+	
+	if(!GetConsoleMode(stdoutHandle, &outMode)) {
+		exit(GetLastError());
+	}
+
+	outModeInit = outMode;
+	
+    // Enable ANSI escape codes
+	outMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+	if(!SetConsoleMode(stdoutHandle, outMode)) {
+		exit(GetLastError());
+	}	
+}
+
+void restoreConsole(void) {
+    // Reset colors
+    printf("\x1b[0m");	
+	
+    // Reset console mode
+	if(!SetConsoleMode(stdoutHandle, outModeInit)) {
+		exit(GetLastError());
+	}
+}
+
+
+#else
+void setupConsole(void) {}
+void restoreConsole(void) {}
+#endif
+
+#define SLP 1
+#define COL 25
+#define ROW 25
 #define GEN 100
 
+
 char grid[COL][ROW], buffer[COL][ROW];
+
 
 void check_neihbours(int i, int j,int *pt);
 void read_input();
@@ -33,7 +83,7 @@ void read_input(){
     int i =0;
     FILE *fptr;
     
-    if((fptr = fopen("in", "r") ) == NULL){
+    if((fptr = fopen("save", "r") ) == NULL){
         printf("File could not be openned\n");
         exit(-1);
     }
@@ -54,30 +104,41 @@ int print_gen(int *g){
     int u =0,s =0;
     printf("\x1b[2J");
     printf("\x1b[H");
+    
+    for(int i=-2;i<=COL;i++){
+        printf("\x1b[1;47m  \x1b[0m");
+    }
+    printf("\n");
     for(int i = 0;i< COL; i++){
+        printf("\x1b[1;47m  \x1b[0m ");
         for(int j=0;j<ROW;j++){
             if(buffer[i][j] == grid[i][j]) s++;
             if(buffer[i][j]=='1'){
                 u++;
-                //printf("O");
-                printf("\x1b[1;47m \x1b[0m");
+                printf("\x1b[1;47m  \x1b[0m");
             }
-            else printf(" ");
+            else printf("  ");
             grid[i][j] = buffer[i][j];
         }
+        printf(" \x1b[1;47m  \x1b[0m");
         printf("\n");
     }
+
+    for(int i=-2;i<=COL;i++){
+        printf("\x1b[1;47m  \x1b[0m");
+    }
+
     *g +=1;
     
     
         if(u == 0 || s == ROW*COL){
             printf("\nSimulación acabada a la gen: %d\n",*g);
-            sleep(3);
+            sleep(SLP);
             return -1;
         }
         printf("\nSimulación nº%d\n",*g);
     
-    sleep(3);
+    sleep(SLP);
     
     return 0;
 }
@@ -86,6 +147,7 @@ int main(){
     printf("\x1b[=14h");
     printf("\x1b[?47h"); //save scren
     printf("\x1b[2J");  //clear screen
+    setupConsole();
     int neighbours, g=0;
     read_input();
     for(int i = 0; i<COL;i++){
@@ -119,6 +181,7 @@ int main(){
         }
         if(print_gen(&g) == -1){
             printf("\x1b[2J");
+            restoreConsole();
             printf("\x1b[?47l"); //restore screen
             return -1;}
     }
