@@ -57,6 +57,7 @@ void restoreConsole(void) {}
 #endif
 
 #define SLP 1
+#define SLP 1*1000000
 #define COL 25
 #define ROW 25
 #define GEN 100
@@ -133,12 +134,12 @@ int print_gen(int *g){
     
         if(u == 0 || s == ROW*COL){
             printf("\nSimulación acabada a la gen: %d\n",*g);
-            sleep(SLP);
+            usleep(SLP);
             return -1;
         }
         printf("\nSimulación nº%d\n",*g);
     
-    sleep(SLP);
+    usleep(SLP);
     
     return 0;
 }
